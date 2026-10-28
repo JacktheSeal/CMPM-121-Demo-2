@@ -8,24 +8,47 @@ heading.textContent = "D2 project";
 const message = document.createElement("p");
 message.textContent = "Your project starts here.";
 
+//canvas setup
 const canvas = document.createElement("canvas");
+canvas.width = 256;
+canvas.height = 256;
 
-app.append(heading, message, canvas);
+const context = canvas.getContext("2d");
 
-let isDrawing = false;
+if (!context) {
+  throw new Error("Failed to get 2d canvas context");
+}
 
-canvas.addEventListener("pointerdown", () => {
+const cursor = { active: false, x: 0, y: 0 };
+
+canvas.addEventListener("pointerdown", (e) => {
   console.log("Pointer down");
-  isDrawing = true;
+  cursor.active = true;
+  cursor.x = e.offsetX;
+  cursor.y = e.offsetY;
 });
 
 canvas.addEventListener("pointerup", () => {
-  console.log("Pointer up");
-  isDrawing = false;
+  cursor.active = false;
 });
 
-canvas.addEventListener("pointermove", () => {
-  if (isDrawing) {
-    // Draw
+canvas.addEventListener("pointermove", (e) => {
+  if (cursor.active) {
+    context.beginPath();
+    context.moveTo(cursor.x, cursor.y);
+    context.lineTo(e.offsetX, e.offsetY);
+    context.stroke();
+    cursor.x = e.offsetX;
+    cursor.y = e.offsetY;
   }
 });
+
+//adds ability to clear canvas
+const clearButton = document.createElement("button");
+clearButton.innerHTML = "clear";
+document.body.append(clearButton);
+clearButton.addEventListener("click", () => {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+app.append(heading, message, canvas);
