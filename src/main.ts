@@ -8,16 +8,26 @@ heading.textContent = "D2 project";
 const message = document.createElement("p");
 message.textContent = "Your project starts here.";
 
-//canvas setup
+// canvas setup
 const canvas = document.createElement("canvas");
 canvas.width = 256;
 canvas.height = 256;
 
+// context setup
 const context = canvas.getContext("2d");
 
 if (!context) {
   throw new Error("Failed to get 2d canvas context");
 }
+
+// setup for memory (redo, undo)
+
+type Point = { x: number; y: number };
+
+const lines: Point[][] = [];
+const redoLines: Point[][] = [];
+
+let currentLine: Point[] | null = null;
 
 const cursor = { active: false, x: 0, y: 0 };
 
@@ -26,29 +36,89 @@ canvas.addEventListener("pointerdown", (e) => {
   cursor.active = true;
   cursor.x = e.offsetX;
   cursor.y = e.offsetY;
+
+  currentLine = [];
+  lines.push(currentLine);
+  redoLines.splice(0, redoLines.length);
+  currentLine.push({ x: cursor.x, y: cursor.y });
+
+  redraw();
 });
 
 canvas.addEventListener("pointerup", () => {
   cursor.active = false;
+  currentLine = null;
 });
 
 canvas.addEventListener("pointermove", (e) => {
-  if (cursor.active) {
-    context.beginPath();
-    context.moveTo(cursor.x, cursor.y);
-    context.lineTo(e.offsetX, e.offsetY);
-    context.stroke();
+  if (cursor.active && currentLine) {
     cursor.x = e.offsetX;
     cursor.y = e.offsetY;
+    currentLine.push({ x: cursor.x, y: cursor.y });
+
+    redraw();
   }
 });
 
-//adds ability to clear canvas
+function redraw() {
+  //rechecked to make sure its the right type (dino was angry)
+  if (!context) {
+    throw new Error("Failed to get 2d canvas context");
+  }
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  for (const line of lines) {
+    if (line.length > 1) {
+      context.beginPath();
+      const { x, y } = line[0];
+      context.moveTo(x, y);
+      for (const { x, y } of line) {
+        context.lineTo(x, y);
+      }
+      context.stroke();
+    }
+  }
+}
+
+document.body.append(document.createElement("br"));
+
+// adds ability to clear canvas
 const clearButton = document.createElement("button");
 clearButton.innerHTML = "clear";
 document.body.append(clearButton);
 clearButton.addEventListener("click", () => {
-  context.clearRect(0, 0, canvas.width, canvas.height);
+  lines.splice(0, lines.length);
+  redraw();
+});
+
+// undo button addition and listener
+const undoButton = document.createElement("button");
+undoButton.innerHTML = "undo";
+document.body.append(undoButton);
+
+undoButton.addEventListener("click", () => {
+  if (lines.length > 0) {
+    const line = lines.pop();
+
+    if (line) {
+      redoLines.push(line);
+      redraw();
+    }
+  }
+});
+
+// redo button addition and listener
+const redoButton = document.createElement("button");
+redoButton.innerHTML = "redo";
+document.body.append(redoButton);
+
+redoButton.addEventListener("click", () => {
+  if (redoLines.length > 0) {
+    const line = redoLines.pop();
+    if (line) {
+      lines.push(line);
+      redraw();
+    }
+  }
 });
 
 app.append(heading, message, canvas);
