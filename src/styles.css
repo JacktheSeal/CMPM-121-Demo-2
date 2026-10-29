@@ -5,9 +5,9 @@ canvas {
 }
 
 button {
-  margin-top: 10px;
+  margin-top: 15px;
   width: 100px;
-  height: 30px;
+  height: 35px;
 }
 
 #yellowButton {
@@ -15,5 +15,5 @@ button {
 }
 
 #blueButton {
-  color: #384278;
+  color: #5666c0;
 }

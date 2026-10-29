@@ -1,5 +1,18 @@
 import "./styles.css";
 
+// Import images
+const squid = new Image();
+squid.src = "/squid.png";
+
+const octo = new Image();
+octo.src = "/octo.png";
+
+const rainmaker = new Image();
+rainmaker.src = "/rainmaker.png";
+
+const splatted = new Image();
+splatted.src = "/splatted.png";
+
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 // context setup
@@ -10,11 +23,19 @@ if (!context) {
 
 // setup for memory (redo, undo)
 type Point = { x: number; y: number };
-type Line = { points: Point[]; color: string };
-const lines: Line[] = [];
-const redoLines: Line[] = [];
+type Line = { type: "line"; points: Point[]; color: string };
+type Stamp = { type: "stamp"; points: Point; image: HTMLImageElement };
+type Drawing = Line | Stamp;
+
+const drawings: Drawing[] = [];
+const redoDrawings: Drawing[] = [];
+
+const stampSize = 30;
 let currentLine: Line | null = null;
+let currentStamp: Stamp | null = null;
 let currentColor: string = "black";
+let currentImage: HTMLImageElement = squid;
+let currentTool = "line";
 
 const cursor = { active: false, x: 0, y: 0 };
 
@@ -27,10 +48,21 @@ canvas.addEventListener("pointerdown", (e) => {
   cursor.x = e.offsetX;
   cursor.y = e.offsetY;
 
-  currentLine = { points: [], color: currentColor };
-  lines.push(currentLine);
-  redoLines.splice(0, redoLines.length);
-  currentLine.points.push({ x: cursor.x, y: cursor.y });
+  if (currentTool === "line") {
+    currentLine = { type: currentTool, points: [], color: currentColor };
+    drawings.push(currentLine);
+    currentLine.points.push({ x: cursor.x, y: cursor.y });
+  }
+  if (currentTool === "stamp") {
+    currentStamp = {
+      type: currentTool,
+      points: { x: cursor.x - stampSize / 2, y: cursor.y - stampSize / 2 },
+      image: currentImage,
+    };
+    drawings.push(currentStamp);
+  }
+
+  redoDrawings.splice(0, redoDrawings.length);
 
   redraw();
 });
@@ -65,16 +97,27 @@ function redraw() {
     throw new Error("Failed to get 2d canvas context");
   }
   context.clearRect(0, 0, canvas.width, canvas.height);
-  for (const line of lines) {
-    if (line.points.length > 1) {
-      context.strokeStyle = line.color;
-      context.beginPath();
-      const { x, y } = line.points[0];
-      context.moveTo(x, y);
-      for (const { x, y } of line.points) {
-        context.lineTo(x, y);
+  for (const drawing of drawings) {
+    if (drawing.type === "line") {
+      if (drawing.points.length > 1) {
+        context.strokeStyle = drawing.color;
+        context.beginPath();
+        const { x, y } = drawing.points[0];
+        context.moveTo(x, y);
+        for (const { x, y } of drawing.points) {
+          context.lineTo(x, y);
+        }
+        context.stroke();
       }
-      context.stroke();
+    }
+    if (drawing.type === "stamp") {
+      context.drawImage(
+        drawing.image,
+        drawing.points.x,
+        drawing.points.y,
+        stampSize,
+        stampSize,
+      );
     }
   }
 }
@@ -85,8 +128,8 @@ function redraw() {
 const clearButton = document.getElementById("clearButton")!;
 
 clearButton.addEventListener("click", () => {
-  lines.splice(0, lines.length);
-  redoLines.splice(0, redoLines.length);
+  drawings.splice(0, drawings.length);
+  redoDrawings.splice(0, redoDrawings.length);
   redraw();
 });
 
@@ -104,11 +147,11 @@ redrawButton.addEventListener("click", () => {
 const undoButton = document.getElementById("undoButton")!;
 
 undoButton.addEventListener("click", () => {
-  if (lines.length > 0) {
-    const line = lines.pop();
+  if (drawings.length > 0) {
+    const drawing = drawings.pop();
 
-    if (line) {
-      redoLines.push(line);
+    if (drawing) {
+      redoDrawings.push(drawing);
       redraw();
     }
   }
@@ -118,29 +161,52 @@ undoButton.addEventListener("click", () => {
 const redoButton = document.getElementById("redoButton")!;
 
 redoButton.addEventListener("click", () => {
-  if (redoLines.length > 0) {
-    const line = redoLines.pop();
+  if (redoDrawings.length > 0) {
+    const line = redoDrawings.pop();
     if (line) {
-      lines.push(line);
+      drawings.push(line);
       redraw();
     }
   }
 });
 
-const blackButton = document.getElementById("blackButton")!;
+type button = { id: string; color?: string; image?: HTMLImageElement };
+type buttonGroup = { type: string; buttons: button[] };
 
-blackButton.addEventListener("click", () => {
-  currentColor = "black";
-});
+const buttons: buttonGroup[] = [{
+  type: "colorButtons",
+  buttons: [
+    { id: "blackButton", color: "black" },
+    { id: "yellowButton", color: "#d7de15" },
+    { id: "blueButton", color: "#1537FF" },
+  ],
+}, {
+  type: "stampButtons",
+  buttons: [
+    { id: "squidButton", image: squid },
+    { id: "octoButton", image: octo },
+    { id: "rainmakerButton", image: rainmaker },
+    { id: "splattedButton", image: splatted },
+  ],
+}];
 
-const yellowButton = document.getElementById("yellowButton")!;
+// Loops through array and object data above and creates buttons with behavior
+for (const group of buttons) {
+  if (group.type === "colorButtons") {
+    for (const button of group.buttons) {
+      document.getElementById(button.id)!.addEventListener("click", () => {
+        if (button.color !== undefined) currentColor = button.color;
+        currentTool = "line";
+      });
+    }
+  }
 
-yellowButton.addEventListener("click", () => {
-  currentColor = "#d7de15";
-});
-
-const blueButton = document.getElementById("blueButton")!;
-
-blueButton.addEventListener("click", () => {
-  currentColor = "#1537FF";
-});
+  if (group.type === "stampButtons") {
+    for (const button of group.buttons) {
+      document.getElementById(button.id)!.addEventListener("click", () => {
+        if (button.image !== undefined) currentImage = button.image;
+        currentTool = "stamp";
+      });
+    }
+  }
+}
