@@ -18,6 +18,7 @@ rainmakerImg.src = rainmaker;
 const splattedImg = document.createElement("img");
 splattedImg.src = splatted;
 
+// canvas is where user can draw
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 // context setup
@@ -26,27 +27,80 @@ if (!context) {
   throw new Error("Failed to get 2d canvas context");
 }
 
-// setup for memory (redo, undo)
+// setup for shared stamp behavior
+type StampTool = {
+  id: string;
+  name: string;
+  image?: HTMLImageElement;
+  content?: string;
+};
+
+// where you can put preset (hardcoded) stamps
+const stampTools: StampTool[] = [
+  { id: "squid", name: "Squid", image: squidImg },
+  { id: "octo", name: "Octo", image: octoImg },
+  { id: "rainmaker", name: "Rainmaker", image: rainmakerImg },
+  { id: "splatted", name: "Splatted", image: splattedImg },
+];
+
+// contains all of the stamps (will be used to render buttons)
+const stampPalette = document.getElementById("stampPalette")!;
+
+// renders stamp buttons using palette
+function renderStampPalette() {
+  stampPalette.replaceChildren();
+
+  for (const tool of stampTools) {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.textContent = tool.content ?? tool.name;
+
+    button.title = tool.name;
+
+    button.addEventListener("click", () => {
+      currentStampTool = tool;
+      currentTool = "stamp";
+    });
+
+    stampPalette.append(button);
+  }
+}
+
+// initial render for all of the presets
+renderStampPalette();
+
+// type definitions for all of the drawables
 type Point = { x: number; y: number };
 type Line = { type: "line"; points: Point[]; color: string };
-type Stamp = { type: "stamp"; points: Point; image: HTMLImageElement };
-type Drawing = Line | Stamp;
+type ImageStamp = {
+  type: "imageStamp";
+  points: Point;
+  image: HTMLImageElement;
+};
+type TextStamp = {
+  type: "textStamp";
+  points: Point;
+  content: string;
+};
+type Drawing = Line | ImageStamp | TextStamp;
 
+// arrays used for storing drawings in memory
 const drawings: Drawing[] = [];
 const redoDrawings: Drawing[] = [];
 
+// defaults
 const stampSize = 30;
 let currentLine: Line | null = null;
-let currentStamp: Stamp | null = null;
 let currentColor: string = "black";
-let currentImage: HTMLImageElement = squidImg;
-let currentTool = "line";
+let currentStampTool: StampTool = stampTools[0];
+let currentTool: "line" | "stamp" = "line";
 
+// position will be used to place all drawables
 const cursor = { active: false, x: 0, y: 0 };
 
-// These next 3 Listeners watch the mouse movement
+// These next 4 listeners watch the mouse movement
 
-// Starts a new line when mouse is clicked
 canvas.addEventListener("pointerdown", (e) => {
   console.log("Pointer down");
   cursor.active = true;
@@ -59,12 +113,29 @@ canvas.addEventListener("pointerdown", (e) => {
     currentLine.points.push({ x: cursor.x, y: cursor.y });
   }
   if (currentTool === "stamp") {
-    currentStamp = {
-      type: currentTool,
-      points: { x: cursor.x - stampSize / 2, y: cursor.y - stampSize / 2 },
-      image: currentImage,
-    };
-    drawings.push(currentStamp);
+    if (currentStampTool.image) {
+      const stamp: ImageStamp = {
+        type: "imageStamp",
+        points: {
+          x: cursor.x - stampSize / 2,
+          y: cursor.y - stampSize / 2,
+        },
+        image: currentStampTool.image,
+      };
+
+      drawings.push(stamp);
+    } else if (currentStampTool.content) {
+      const stamp: TextStamp = {
+        type: "textStamp",
+        points: {
+          x: cursor.x - stampSize / 2,
+          y: cursor.y - stampSize / 2,
+        },
+        content: currentStampTool.content,
+      };
+
+      drawings.push(stamp);
+    }
   }
 
   redoDrawings.splice(0, redoDrawings.length);
@@ -97,10 +168,11 @@ canvas.addEventListener("pointermove", (e) => {
 
 // Series of points becomes a series of line segments which are then drawn in a single stroke
 function redraw() {
-  // rechecked to make sure its the right type (deno was angry)
+  // rechecked to make sure its the right type (deno gets angry otherwise)
   if (!context) {
     throw new Error("Failed to get 2d canvas context");
   }
+
   context.clearRect(0, 0, canvas.width, canvas.height);
   for (const drawing of drawings) {
     if (drawing.type === "line") {
@@ -115,7 +187,7 @@ function redraw() {
         context.stroke();
       }
     }
-    if (drawing.type === "stamp") {
+    if (drawing.type === "imageStamp") {
       context.drawImage(
         drawing.image,
         drawing.points.x,
@@ -124,57 +196,23 @@ function redraw() {
         stampSize,
       );
     }
+
+    if (drawing.type === "textStamp") {
+      context.font = `${stampSize}px sans-serif`;
+      context.textAlign = "left";
+      context.textBaseline = "top";
+      context.fillStyle = "black";
+
+      context.fillText(
+        drawing.content,
+        drawing.points.x,
+        drawing.points.y,
+      );
+    }
   }
 }
 
-//document.body.append(document.createElement("br"));
-
-// adds ability to clear canvas
-const clearButton = document.getElementById("clearButton")!;
-
-clearButton.addEventListener("click", () => {
-  drawings.splice(0, drawings.length);
-  redoDrawings.splice(0, redoDrawings.length);
-  redraw();
-});
-
-//redraws the whole canvas
-const redrawButton = document.getElementById("redrawButton")!;
-
-redrawButton.addEventListener("click", () => {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  setTimeout(() => {
-    redraw();
-  }, 1000);
-});
-
-// undo button addition and listener
-const undoButton = document.getElementById("undoButton")!;
-
-undoButton.addEventListener("click", () => {
-  if (drawings.length > 0) {
-    const drawing = drawings.pop();
-
-    if (drawing) {
-      redoDrawings.push(drawing);
-      redraw();
-    }
-  }
-});
-
-// redo button addition and listener
-const redoButton = document.getElementById("redoButton")!;
-
-redoButton.addEventListener("click", () => {
-  if (redoDrawings.length > 0) {
-    const line = redoDrawings.pop();
-    if (line) {
-      drawings.push(line);
-      redraw();
-    }
-  }
-});
-
+// Jack left the other buttons as is because they didnt immediately require user creation design
 type button = { id: string; color?: string; image?: HTMLImageElement };
 type buttonGroup = { type: string; buttons: button[] };
 
@@ -184,14 +222,6 @@ const buttons: buttonGroup[] = [{
     { id: "blackButton", color: "black" },
     { id: "yellowButton", color: "#d7de15" },
     { id: "blueButton", color: "#1537FF" },
-  ],
-}, {
-  type: "stampButtons",
-  buttons: [
-    { id: "squidButton", image: squidImg },
-    { id: "octoButton", image: octoImg },
-    { id: "rainmakerButton", image: rainmakerImg },
-    { id: "splattedButton", image: splattedImg },
   ],
 }];
 
@@ -205,13 +235,85 @@ for (const group of buttons) {
       });
     }
   }
+}
 
-  if (group.type === "stampButtons") {
-    for (const button of group.buttons) {
-      document.getElementById(button.id)!.addEventListener("click", () => {
-        if (button.image !== undefined) currentImage = button.image;
-        currentTool = "stamp";
-      });
+//Creates elements for user created stamps (maybe should be moved into index)
+const createStampForm = document.getElementById(
+  "createStampForm",
+) as HTMLFormElement;
+
+const stampNameInput = document.getElementById(
+  "stampName",
+) as HTMLInputElement;
+
+const stampContentInput = document.getElementById(
+  "stampContent",
+) as HTMLInputElement;
+
+createStampForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = stampNameInput.value.trim();
+  const content = stampContentInput.value.trim();
+
+  if (!name || !content) {
+    return;
+  }
+
+  //id is unique!
+  const newTool: StampTool = {
+    id: crypto.randomUUID(),
+    name,
+    content,
+  };
+
+  stampTools.push(newTool);
+
+  renderStampPalette();
+
+  stampNameInput.value = "";
+  stampContentInput.value = "";
+});
+
+// PERMANENT BUTTONS (Canvas Functions, not Tools)
+// adds ability to clear canvas
+const clearButton = document.getElementById("clearButton")!;
+clearButton.addEventListener("click", () => {
+  drawings.splice(0, drawings.length);
+  redoDrawings.splice(0, redoDrawings.length);
+  redraw();
+});
+
+//redraws the whole canvas
+const redrawButton = document.getElementById("redrawButton")!;
+redrawButton.addEventListener("click", () => {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  setTimeout(() => {
+    redraw();
+  }, 1000);
+});
+
+// undo button addition and listener
+const undoButton = document.getElementById("undoButton")!;
+undoButton.addEventListener("click", () => {
+  if (drawings.length > 0) {
+    const drawing = drawings.pop();
+
+    if (drawing) {
+      redoDrawings.push(drawing);
+      redraw();
     }
   }
-}
+});
+
+// redo button addition and listener
+const redoButton = document.getElementById("redoButton")!;
+redoButton.addEventListener("click", () => {
+  if (redoDrawings.length > 0) {
+    const line = redoDrawings.pop();
+    if (line) {
+      drawings.push(line);
+      redraw();
+    }
+  }
+});

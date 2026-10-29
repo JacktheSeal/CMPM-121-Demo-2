@@ -24,12 +24,23 @@
         <button id="blueButton">Blue</button>
       </div>
 
-      <div id="stampDiv">
-        <button id="squidButton">Squid</button>
-        <button id="octoButton">Octopus</button>
-        <button id="rainmakerButton">Rainmaker</button>
-        <button id="splattedButton">Splatted</button>
-      </div>
+      <div id="stampPalette"></div>
+
+      <form id="createStampForm">
+        <input
+          id="stampName"
+          type="text"
+          placeholder="Tool name"
+        />
+
+        <input
+          id="stampContent"
+          type="text"
+          placeholder="Emoji or short text"
+        />
+
+        <button type="submit">Create tool</button>
+      </form>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
