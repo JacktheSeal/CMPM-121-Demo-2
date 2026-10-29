@@ -1,22 +1,22 @@
 import "./styles.css";
 
 // Import images
-import squid from "./assets/squid.PNG?no-inline";
-import octo from "./assets/octo.PNG?no-inline";
-import rainmaker from "./assets/rainmaker.PNG?no-inline";
-import splatted from "./assets/splatted.PNG?no-inline";
+import squid from "./assets/squid.png?no-inline";
+import octo from "./assets/octo.png?no-inline";
+import rainmaker from "./assets/rainmaker.png?no-inline";
+import splatted from "./assets/splatted.png?no-inline";
 
 const squidImg = new Image();
-squid.src = squidImg;
+squidImg.src = squid;
 
 const octoImg = new Image();
-octo.src = octoImg;
+octoImg.src = octo;
 
 const rainmakerImg = new Image();
-rainmaker.src = rainmakerImg;
+rainmakerImg.src = rainmaker;
 
 const splattedImg = new Image();
-splatted.src = splattedImg;
+splattedImg.src = splatted;
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
