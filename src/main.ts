@@ -6,16 +6,16 @@ import octo from "./assets/octo.png?no-inline";
 import rainmaker from "./assets/rainmaker.png?no-inline";
 import splatted from "./assets/splatted.png?no-inline";
 
-const squidImg = new Image();
+const squidImg = document.createElement("img");
 squidImg.src = squid;
 
-const octoImg = new Image();
+const octoImg = document.createElement("img");
 octoImg.src = octo;
 
-const rainmakerImg = new Image();
+const rainmakerImg = document.createElement("img");
 rainmakerImg.src = rainmaker;
 
-const splattedImg = new Image();
+const splattedImg = document.createElement("img");
 splattedImg.src = splatted;
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -39,7 +39,7 @@ const stampSize = 30;
 let currentLine: Line | null = null;
 let currentStamp: Stamp | null = null;
 let currentColor: string = "black";
-let currentImage: HTMLImageElement = squid;
+let currentImage: HTMLImageElement = squidImg;
 let currentTool = "line";
 
 const cursor = { active: false, x: 0, y: 0 };
@@ -188,10 +188,10 @@ const buttons: buttonGroup[] = [{
 }, {
   type: "stampButtons",
   buttons: [
-    { id: "squidButton", image: squid },
-    { id: "octoButton", image: octo },
-    { id: "rainmakerButton", image: rainmaker },
-    { id: "splattedButton", image: splatted },
+    { id: "squidButton", image: squidImg },
+    { id: "octoButton", image: octoImg },
+    { id: "rainmakerButton", image: rainmakerImg },
+    { id: "splattedButton", image: splattedImg },
   ],
 }];
 
