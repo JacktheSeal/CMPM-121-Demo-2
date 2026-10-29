@@ -10,9 +10,11 @@ if (!context) {
 
 // setup for memory (redo, undo)
 type Point = { x: number; y: number };
-const lines: Point[][] = [];
-const redoLines: Point[][] = [];
-let currentLine: Point[] | null = null;
+type Line = { points: Point[]; color: string };
+const lines: Line[] = [];
+const redoLines: Line[] = [];
+let currentLine: Line | null = null;
+let currentColor: string = "black";
 
 const cursor = { active: false, x: 0, y: 0 };
 
@@ -25,10 +27,10 @@ canvas.addEventListener("pointerdown", (e) => {
   cursor.x = e.offsetX;
   cursor.y = e.offsetY;
 
-  currentLine = [];
+  currentLine = { points: [], color: currentColor };
   lines.push(currentLine);
   redoLines.splice(0, redoLines.length);
-  currentLine.push({ x: cursor.x, y: cursor.y });
+  currentLine.points.push({ x: cursor.x, y: cursor.y });
 
   redraw();
 });
@@ -39,12 +41,18 @@ canvas.addEventListener("pointerup", () => {
   currentLine = null;
 });
 
+// Ends the line when the mouse leaves the canvas
+canvas.addEventListener("pointerleave", () => {
+  cursor.active = false;
+  currentLine = null;
+});
+
 // Tracks movement of mouse when is converted in redraw to a line
 canvas.addEventListener("pointermove", (e) => {
   if (cursor.active && currentLine) {
     cursor.x = e.offsetX;
     cursor.y = e.offsetY;
-    currentLine.push({ x: cursor.x, y: cursor.y });
+    currentLine.points.push({ x: cursor.x, y: cursor.y });
 
     redraw();
   }
@@ -58,11 +66,12 @@ function redraw() {
   }
   context.clearRect(0, 0, canvas.width, canvas.height);
   for (const line of lines) {
-    if (line.length > 1) {
+    if (line.points.length > 1) {
+      context.strokeStyle = line.color;
       context.beginPath();
-      const { x, y } = line[0];
+      const { x, y } = line.points[0];
       context.moveTo(x, y);
-      for (const { x, y } of line) {
+      for (const { x, y } of line.points) {
         context.lineTo(x, y);
       }
       context.stroke();
@@ -116,4 +125,22 @@ redoButton.addEventListener("click", () => {
       redraw();
     }
   }
+});
+
+const blackButton = document.getElementById("blackButton")!;
+
+blackButton.addEventListener("click", () => {
+  currentColor = "black";
+});
+
+const pinkButton = document.getElementById("pinkButton")!;
+
+pinkButton.addEventListener("click", () => {
+  currentColor = "#F13574";
+});
+
+const greenButton = document.getElementById("greenButton")!;
+
+greenButton.addEventListener("click", () => {
+  currentColor = "#3bb95f";
 });
