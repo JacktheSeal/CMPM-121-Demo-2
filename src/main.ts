@@ -1,17 +1,6 @@
 import "./styles.css";
 
-const app = document.querySelector<HTMLElement>("#app")!;
-
-const heading = document.createElement("h1");
-heading.textContent = "D2 project";
-
-const message = document.createElement("p");
-message.textContent = "Your project starts here.";
-
-// canvas setup
-const canvas = document.createElement("canvas");
-canvas.width = 256;
-canvas.height = 256;
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 // context setup
 const context = canvas.getContext("2d");
@@ -84,9 +73,7 @@ function redraw() {
 //document.body.append(document.createElement("br"));
 
 // adds ability to clear canvas
-const clearButton = document.createElement("button");
-clearButton.innerHTML = "clear";
-document.body.append(clearButton);
+const clearButton = document.getElementById("clearButton")!;
 
 clearButton.addEventListener("click", () => {
   lines.splice(0, lines.length);
@@ -95,9 +82,7 @@ clearButton.addEventListener("click", () => {
 });
 
 //redraws the whole canvas
-const redrawButton = document.createElement("button");
-redrawButton.innerHTML = "redraw";
-document.body.append(redrawButton);
+const redrawButton = document.getElementById("redrawButton")!;
 
 redrawButton.addEventListener("click", () => {
   context.clearRect(0, 0, canvas.width, canvas.height);
@@ -107,9 +92,7 @@ redrawButton.addEventListener("click", () => {
 });
 
 // undo button addition and listener
-const undoButton = document.createElement("button");
-undoButton.innerHTML = "undo";
-document.body.append(undoButton);
+const undoButton = document.getElementById("undoButton")!;
 
 undoButton.addEventListener("click", () => {
   if (lines.length > 0) {
@@ -123,9 +106,7 @@ undoButton.addEventListener("click", () => {
 });
 
 // redo button addition and listener
-const redoButton = document.createElement("button");
-redoButton.innerHTML = "redo";
-document.body.append(redoButton);
+const redoButton = document.getElementById("redoButton")!;
 
 redoButton.addEventListener("click", () => {
   if (redoLines.length > 0) {
@@ -136,5 +117,3 @@ redoButton.addEventListener("click", () => {
     }
   }
 });
-
-app.append(heading, message, canvas);
