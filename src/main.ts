@@ -87,9 +87,23 @@ function redraw() {
 const clearButton = document.createElement("button");
 clearButton.innerHTML = "clear";
 document.body.append(clearButton);
+
 clearButton.addEventListener("click", () => {
   lines.splice(0, lines.length);
+  redoLines.splice(0, redoLines.length);
   redraw();
+});
+
+//redraws the whole canvas
+const redrawButton = document.createElement("button");
+redrawButton.innerHTML = "redraw";
+document.body.append(redrawButton);
+
+redrawButton.addEventListener("click", () => {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  setTimeout(() => {
+    redraw();
+  }, 1000);
 });
 
 // undo button addition and listener
