@@ -15,22 +15,21 @@ canvas.height = 256;
 
 // context setup
 const context = canvas.getContext("2d");
-
 if (!context) {
   throw new Error("Failed to get 2d canvas context");
 }
 
 // setup for memory (redo, undo)
-
 type Point = { x: number; y: number };
-
 const lines: Point[][] = [];
 const redoLines: Point[][] = [];
-
 let currentLine: Point[] | null = null;
 
 const cursor = { active: false, x: 0, y: 0 };
 
+// These next 3 Listeners watch the mouse movement
+
+// Starts a new line when mouse is clicked
 canvas.addEventListener("pointerdown", (e) => {
   console.log("Pointer down");
   cursor.active = true;
@@ -45,11 +44,13 @@ canvas.addEventListener("pointerdown", (e) => {
   redraw();
 });
 
+// Ends the line when the mouse is unclicked
 canvas.addEventListener("pointerup", () => {
   cursor.active = false;
   currentLine = null;
 });
 
+// Tracks movement of mouse when is converted in redraw to a line
 canvas.addEventListener("pointermove", (e) => {
   if (cursor.active && currentLine) {
     cursor.x = e.offsetX;
@@ -60,8 +61,9 @@ canvas.addEventListener("pointermove", (e) => {
   }
 });
 
+// Series of points becomes a series of line segments which are then drawn in a single stroke
 function redraw() {
-  //rechecked to make sure its the right type (dino was angry)
+  // rechecked to make sure its the right type (deno was angry)
   if (!context) {
     throw new Error("Failed to get 2d canvas context");
   }
@@ -79,7 +81,7 @@ function redraw() {
   }
 }
 
-document.body.append(document.createElement("br"));
+//document.body.append(document.createElement("br"));
 
 // adds ability to clear canvas
 const clearButton = document.createElement("button");
