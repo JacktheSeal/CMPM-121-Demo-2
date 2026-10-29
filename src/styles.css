@@ -1,7 +1,19 @@
 canvas {
-  background-color: rgb(236, 235, 235);
   border-width: 2px;
   border-style: solid;
   display: block;
-  margin-bottom: 4px;
+}
+
+button {
+  margin-top: 10px;
+  width: 100px;
+  height: 30px;
+}
+
+#yellowButton {
+  color: #979c07;
+}
+
+#blueButton {
+  color: #384278;
 }

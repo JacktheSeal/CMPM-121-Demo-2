@@ -133,14 +133,14 @@ blackButton.addEventListener("click", () => {
   currentColor = "black";
 });
 
-const pinkButton = document.getElementById("pinkButton")!;
+const yellowButton = document.getElementById("yellowButton")!;
 
-pinkButton.addEventListener("click", () => {
-  currentColor = "#F13574";
+yellowButton.addEventListener("click", () => {
+  currentColor = "#d7de15";
 });
 
-const greenButton = document.getElementById("greenButton")!;
+const blueButton = document.getElementById("blueButton")!;
 
-greenButton.addEventListener("click", () => {
-  currentColor = "#3bb95f";
+blueButton.addEventListener("click", () => {
+  currentColor = "#1537FF";
 });
