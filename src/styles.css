@@ -3,6 +3,7 @@ body {
   background-size: cover;
   display: flex;
   justify-content: center;
+  margin-top: 12vh;
 }
 
 p,
@@ -17,6 +18,10 @@ h3 {
 h1 {
   font-family: "Luckiest Guy", sans-serif;
   font-weight: 100;
+}
+
+p {
+  font-family: Trebuchet MS;
 }
 
 canvas {
@@ -43,12 +48,20 @@ button {
   margin: 2px;
   border-radius: 10px;
   background-color: rgb(196, 195, 195);
+  font-family: Trebuchet MS;
+}
+
+#blackButton {
+  background-color: black;
+  color: rgb(213, 211, 211);
 }
 
 #yellowButton {
-  color: #979c07;
+  background-color: #e0e452;
+  color: rgb(109, 109, 109);
 }
 
 #blueButton {
-  color: #5666c0;
+  background-color: #5666c0;
+  color: rgb(235, 235, 235);
 }
