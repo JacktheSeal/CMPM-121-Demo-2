@@ -1,13 +1,48 @@
+body {
+  background-image: url("src/assets/home-2x.jpg");
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+}
+
+p,
+h1,
+h2,
+h3 {
+  display: flex;
+  color: rgb(226, 226, 226);
+  justify-content: center;
+}
+
+h1 {
+  font-family: "Luckiest Guy", sans-serif;
+  font-weight: 100;
+}
+
 canvas {
-  border-width: 2px;
+  border-width: 5px;
   border-style: solid;
+  border-color: rgb(162, 168, 43);
   display: block;
+  margin: auto;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+div {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
 }
 
 button {
-  margin-top: 15px;
   width: 100px;
   height: 35px;
+  margin: 2px;
+  border-radius: 10px;
+  background-color: rgb(196, 195, 195);
 }
 
 #yellowButton {
