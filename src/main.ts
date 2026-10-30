@@ -249,32 +249,8 @@ function redraw() {
 
 function exportPNG() {
   // we need a seperate canvas because it's going to be scaled
-  const exportCanvas = document.createElement("canvas");
+  const exportCanvas = createExportCanvas(2);
 
-  // scaling the canvas by 2
-  exportCanvas.width = canvas.width * 2;
-  exportCanvas.height = canvas.height * 2;
-
-  const exportContext = getCanvasContext(exportCanvas);
-
-  if (!exportContext) {
-    throw new Error("Failed to get export canvas context");
-  }
-
-  // excludes the current line because it is unfinished
-  const committedDrawings = drawings.filter(
-    (drawing) => drawing !== currentLine,
-  );
-
-  // render the drawings at 2x
-  renderDrawings(
-    exportContext,
-    exportCanvas,
-    committedDrawings,
-    2,
-  );
-
-  // turns out canvases have the ability to be exported straight to data!
   const imageURL = exportCanvas.toDataURL("image/png");
 
   const link = document.createElement("a");
@@ -282,6 +258,31 @@ function exportPNG() {
   link.download = "strategy-map.png";
 
   link.click();
+}
+
+// helper function for creating scaled canvas for exports
+function createExportCanvas(scale: number): HTMLCanvasElement {
+  const exportCanvas = document.createElement("canvas");
+
+  // scales the canvas to desired size
+  exportCanvas.width = canvas.width * scale;
+  exportCanvas.height = canvas.height * scale;
+
+  const exportContext = getCanvasContext(exportCanvas);
+
+  // filter out current line because it is incomplete
+  const committedDrawings = drawings.filter(
+    (drawing) => drawing !== currentLine,
+  );
+
+  renderDrawings(
+    exportContext,
+    exportCanvas,
+    committedDrawings,
+    scale,
+  );
+
+  return exportCanvas;
 }
 
 // Jack left the other buttons as is because they didnt immediately require user creation design
