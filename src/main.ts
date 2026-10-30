@@ -22,15 +22,18 @@ splattedImg.src = splatted;
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 // context setup
-const context: CanvasRenderingContext2D = (() => {
-  const ctx = canvas.getContext("2d");
+function getCanvasContext(
+  canvas: HTMLCanvasElement,
+): CanvasRenderingContext2D {
+  const context = canvas.getContext("2d");
 
-  if (!ctx) {
+  if (!context) {
     throw new Error("Failed to get 2d canvas context");
   }
 
-  return ctx;
-})();
+  return context;
+}
+const context = getCanvasContext(canvas);
 
 // setup for shared stamp behavior
 type StampTool = {
@@ -252,7 +255,7 @@ function exportPNG() {
   exportCanvas.width = canvas.width * 2;
   exportCanvas.height = canvas.height * 2;
 
-  const exportContext = exportCanvas.getContext("2d");
+  const exportContext = getCanvasContext(exportCanvas);
 
   if (!exportContext) {
     throw new Error("Failed to get export canvas context");
