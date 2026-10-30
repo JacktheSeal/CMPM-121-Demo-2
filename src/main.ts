@@ -22,10 +22,15 @@ splattedImg.src = splatted;
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 // context setup
-const context = canvas.getContext("2d");
-if (!context) {
-  throw new Error("Failed to get 2d canvas context");
-}
+const context: CanvasRenderingContext2D = (() => {
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Failed to get 2d canvas context");
+  }
+
+  return ctx;
+})();
 
 // setup for shared stamp behavior
 type StampTool = {
@@ -166,29 +171,48 @@ canvas.addEventListener("pointermove", (e) => {
   }
 });
 
-// Series of points becomes a series of line segments which are then drawn in a single stroke
-function redraw() {
-  // rechecked to make sure its the right type (deno gets angry otherwise)
-  if (!context) {
-    throw new Error("Failed to get 2d canvas context");
-  }
+// shared data driven rendering
+function renderDrawings(
+  targetContext: CanvasRenderingContext2D,
+  targetCanvas: HTMLCanvasElement,
+  queuedDrawings: Drawing[],
+  scale: number = 1,
+) {
+  //save context because export will adjust parameters
+  targetContext.save();
 
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  for (const drawing of drawings) {
+  // clear target canvas completely
+  targetContext.setTransform(1, 0, 0, 1, 0, 0);
+  targetContext.clearRect(
+    0,
+    0,
+    targetCanvas.width,
+    targetCanvas.height,
+  );
+
+  // ensures that all drawables match the scale of the canvas
+  targetContext.setTransform(scale, 0, 0, scale, 0, 0);
+
+  // previously in redraw(), handles rendering of drawn objects
+  for (const drawing of queuedDrawings) {
     if (drawing.type === "line") {
       if (drawing.points.length > 1) {
-        context.strokeStyle = drawing.color;
-        context.beginPath();
+        targetContext.strokeStyle = drawing.color;
+        targetContext.beginPath();
+
         const { x, y } = drawing.points[0];
-        context.moveTo(x, y);
+        targetContext.moveTo(x, y);
+
         for (const { x, y } of drawing.points) {
-          context.lineTo(x, y);
+          targetContext.lineTo(x, y);
         }
-        context.stroke();
+
+        targetContext.stroke();
       }
     }
+
     if (drawing.type === "imageStamp") {
-      context.drawImage(
+      targetContext.drawImage(
         drawing.image,
         drawing.points.x,
         drawing.points.y,
@@ -198,18 +222,63 @@ function redraw() {
     }
 
     if (drawing.type === "textStamp") {
-      context.font = `${stampSize}px sans-serif`;
-      context.textAlign = "left";
-      context.textBaseline = "top";
-      context.fillStyle = "black";
+      targetContext.font = `${stampSize}px sans-serif`;
+      targetContext.textAlign = "left";
+      targetContext.textBaseline = "top";
+      targetContext.fillStyle = "black";
 
-      context.fillText(
+      targetContext.fillText(
         drawing.content,
         drawing.points.x,
         drawing.points.y,
       );
     }
   }
+
+  // restores the original context
+  targetContext.restore();
+}
+
+// user canvas redraw
+function redraw() {
+  renderDrawings(context, canvas, drawings);
+}
+
+function exportPNG() {
+  // we need a seperate canvas because it's going to be scaled
+  const exportCanvas = document.createElement("canvas");
+
+  // scaling the canvas by 2
+  exportCanvas.width = canvas.width * 2;
+  exportCanvas.height = canvas.height * 2;
+
+  const exportContext = exportCanvas.getContext("2d");
+
+  if (!exportContext) {
+    throw new Error("Failed to get export canvas context");
+  }
+
+  // excludes the current line because it is unfinished
+  const committedDrawings = drawings.filter(
+    (drawing) => drawing !== currentLine,
+  );
+
+  // render the drawings at 2x
+  renderDrawings(
+    exportContext,
+    exportCanvas,
+    committedDrawings,
+    2,
+  );
+
+  // turns out canvases have the ability to be exported straight to data!
+  const imageURL = exportCanvas.toDataURL("image/png");
+
+  const link = document.createElement("a");
+  link.href = imageURL;
+  link.download = "strategy-map.png";
+
+  link.click();
 }
 
 // Jack left the other buttons as is because they didnt immediately require user creation design
@@ -276,6 +345,14 @@ createStampForm.addEventListener("submit", (e) => {
 });
 
 // PERMANENT BUTTONS (Canvas Functions, not Tools)
+
+// lets you export canvas as png
+const exportButton = document.getElementById("exportButton")!;
+
+exportButton.addEventListener("click", () => {
+  exportPNG();
+});
+
 // adds ability to clear canvas
 const clearButton = document.getElementById("clearButton")!;
 clearButton.addEventListener("click", () => {
