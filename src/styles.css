@@ -58,10 +58,28 @@ button {
 
 #yellowButton {
   background-color: #e0e452;
-  color: rgb(109, 109, 109);
+  color: rgb(57, 57, 57);
 }
 
 #blueButton {
-  background-color: #5666c0;
+  background-color: #3f52be;
   color: rgb(235, 235, 235);
+}
+
+button:hover {
+  background-color: rgb(203, 211, 144);
+  color: rgb(57, 57, 57);
+  transform: scale(1.05);
+}
+
+#blackButton:hover,
+#yellowButton:hover,
+#blueButton:hover {
+  transform: scale(1.05);
+}
+
+#stampPalette button:hover {
+  background-color: rgb(125, 134, 186);
+  color: rgb(44, 44, 44);
+  transform: scale(1.05);
 }
