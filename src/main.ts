@@ -5,6 +5,9 @@ import squid from "./assets/squid.png?no-inline";
 import octo from "./assets/octo.png?no-inline";
 import rainmaker from "./assets/rainmaker.png?no-inline";
 import splatted from "./assets/splatted.png?no-inline";
+import background from "./assets/background.jpg?no-inline";
+
+document.body.style.backgroundImage = `url(${background})`;
 
 const squidImg = document.createElement("img");
 squidImg.src = squid;
