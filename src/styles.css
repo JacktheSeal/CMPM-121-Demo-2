@@ -30,6 +30,7 @@ canvas {
   display: block;
   margin: auto;
   margin-top: 40px;
+  background-size: 100% 100%;
   margin-bottom: 40px;
   background-color: white;
   border-radius: 10px;

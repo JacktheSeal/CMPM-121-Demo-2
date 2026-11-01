@@ -6,8 +6,7 @@ import octo from "./assets/octo.png?no-inline";
 import rainmaker from "./assets/rainmaker.png?no-inline";
 import splatted from "./assets/splatted.png?no-inline";
 import background from "./assets/background.jpg?no-inline";
-
-document.body.style.backgroundImage = `url(${background})`;
+import ScorchGorge from "./assets/ScorchGorge.png?no-inline";
 
 const squidImg = document.createElement("img");
 squidImg.src = squid;
@@ -24,6 +23,10 @@ splattedImg.src = splatted;
 // canvas is where user can draw
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
+// setting backgrounds
+document.body.style.backgroundImage = `url(${background})`;
+canvas.style.backgroundImage = `url(${ScorchGorge})`;
+
 // context setup
 function getCanvasContext(
   canvas: HTMLCanvasElement,
@@ -37,6 +40,7 @@ function getCanvasContext(
   return context;
 }
 const context = getCanvasContext(canvas);
+context.lineWidth = 3;
 
 // setup for shared stamp behavior
 type StampTool = {
@@ -296,8 +300,8 @@ const buttons: buttonGroup[] = [{
   type: "colorButtons",
   buttons: [
     { id: "blackButton", color: "black" },
-    { id: "yellowButton", color: "#d7de15" },
-    { id: "blueButton", color: "#1537FF" },
+    { id: "yellowButton", color: "#CAF47C" },
+    { id: "blueButton", color: "#1330d1" },
   ],
 }];
 
