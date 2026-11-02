@@ -20,6 +20,9 @@ rainmakerImg.src = rainmaker;
 const splattedImg = document.createElement("img");
 splattedImg.src = splatted;
 
+const scorchGorgeImg = document.createElement("img");
+scorchGorgeImg.src = ScorchGorge;
+
 // canvas is where user can draw
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
@@ -202,6 +205,15 @@ function renderDrawings(
 
   // ensures that all drawables match the scale of the canvas
   targetContext.setTransform(scale, 0, 0, scale, 0, 0);
+  if (targetCanvas !== canvas) {
+    targetContext.drawImage(
+      scorchGorgeImg,
+      0,
+      0,
+      targetCanvas.width / scale,
+      targetCanvas.height / scale,
+    );
+  }
 
   // previously in redraw(), handles rendering of drawn objects
   for (const drawing of queuedDrawings) {
