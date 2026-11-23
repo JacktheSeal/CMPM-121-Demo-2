@@ -2,7 +2,7 @@ body {
   background-size: cover;
   display: flex;
   justify-content: center;
-  margin-top: 5vh;
+  margin-top: 2vh;
 }
 
 p,
@@ -51,6 +51,10 @@ button {
   font-family: Trebuchet MS;
 }
 
+#maps button {
+  width: 125px;
+}
+
 #blackButton {
   background-color: black;
   color: rgb(213, 211, 211);
@@ -80,6 +84,12 @@ button:hover {
 
 #stampPalette button:hover {
   background-color: rgb(125, 134, 186);
+  color: rgb(44, 44, 44);
+  transform: scale(1.05);
+}
+
+#maps button:hover {
+  background-color: rgb(139, 186, 153);
   color: rgb(44, 44, 44);
   transform: scale(1.05);
 }

@@ -6,7 +6,30 @@ import octo from "./assets/octo.png?no-inline";
 import rainmaker from "./assets/rainmaker.png?no-inline";
 import splatted from "./assets/splatted.png?no-inline";
 import background from "./assets/background.jpg?no-inline";
-import ScorchGorge from "./assets/ScorchGorge.png?no-inline";
+import ScorchGorge from "./assets/maps/ScorchGorge.png?no-inline";
+import MantaMaria from "./assets/maps/MantaMaria.png?no-inline";
+
+import UndertowSpillway from "./assets/maps/UndertowSpillway.png?no-inline";
+
+const maps = [
+  { name: "Scorch Gorge", url: ScorchGorge },
+  { name: "Manta Maria", url: MantaMaria },
+  { name: "Undertow Spillway", url: UndertowSpillway },
+];
+for (const map of maps) {
+  const button = document.createElement("button");
+
+  button.type = "button";
+  button.textContent = map.name;
+
+  button.title = "Switch map";
+
+  button.addEventListener("click", () => {
+    canvas.style.backgroundImage = `url(${map.url})`;
+  });
+
+  document.getElementById("maps")!.append(button);
+}
 
 const squidImg = document.createElement("img");
 squidImg.src = squid;
