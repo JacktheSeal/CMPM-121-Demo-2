@@ -15,6 +15,7 @@ const maps = [
   { name: "Scorch Gorge", url: ScorchGorge },
   { name: "Manta Maria", url: MantaMaria },
   { name: "Undertow Spillway", url: UndertowSpillway },
+  { name: "Blank", url: null },
 ];
 for (const map of maps) {
   const button = document.createElement("button");
@@ -25,6 +26,7 @@ for (const map of maps) {
   button.title = "Switch map";
 
   button.addEventListener("click", () => {
+    if (map.url === null) canvas.style.backgroundImage = `white`;
     canvas.style.backgroundImage = `url(${map.url})`;
   });
 

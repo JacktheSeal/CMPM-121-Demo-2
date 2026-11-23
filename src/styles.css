@@ -89,7 +89,7 @@ button:hover {
 }
 
 #maps button:hover {
-  background-color: rgb(139, 186, 153);
+  background-color: rgb(139, 186, 177);
   color: rgb(44, 44, 44);
   transform: scale(1.05);
 }
