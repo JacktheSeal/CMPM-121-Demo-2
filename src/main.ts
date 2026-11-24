@@ -1,4 +1,5 @@
 import "./styles.css";
+import { playPenSound, playSound } from "./sounds.ts";
 
 // Import images
 import squid from "./assets/squid.png?no-inline";
@@ -25,6 +26,7 @@ for (const map of maps) {
   button.title = "Switch map";
 
   button.addEventListener("click", () => {
+    playSound("Map");
     if (map.url === null) canvas.style.backgroundImage = `white`;
     canvas.style.backgroundImage = `url(${map.url})`;
   });
@@ -101,6 +103,7 @@ function renderStampPalette() {
     button.title = tool.name;
 
     button.addEventListener("click", () => {
+      playSound("Stamp");
       currentStampTool = tool;
       currentTool = "stamp";
     });
@@ -150,11 +153,14 @@ canvas.addEventListener("pointerdown", (e) => {
   cursor.y = e.offsetY;
 
   if (currentTool === "line") {
+    playPenSound(true);
+
     currentLine = { type: currentTool, points: [], color: currentColor };
     drawings.push(currentLine);
     currentLine.points.push({ x: cursor.x, y: cursor.y });
   }
   if (currentTool === "stamp") {
+    playSound(currentStampTool.name, 0.3);
     if (currentStampTool.image) {
       const stamp: ImageStamp = {
         type: "imageStamp",
@@ -187,12 +193,14 @@ canvas.addEventListener("pointerdown", (e) => {
 
 // Ends the line when the mouse is unclicked
 canvas.addEventListener("pointerup", () => {
+  playPenSound(false);
   cursor.active = false;
   currentLine = null;
 });
 
 // Ends the line when the mouse leaves the canvas
 canvas.addEventListener("pointerleave", () => {
+  playPenSound(false);
   cursor.active = false;
   currentLine = null;
 });
@@ -346,6 +354,7 @@ for (const group of buttons) {
   if (group.type === "colorButtons") {
     for (const button of group.buttons) {
       document.getElementById(button.id)!.addEventListener("click", () => {
+        playSound("Paint");
         if (button.color !== undefined) currentColor = button.color;
         currentTool = "line";
       });
@@ -367,10 +376,12 @@ const stampContentInput = document.getElementById(
 ) as HTMLInputElement;
 
 createStampForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-
   const name = stampNameInput.value.trim();
   const content = stampContentInput.value.trim();
+
+  if (!name || !content) playSound("CannotCreate");
+  else playSound("Create");
+  e.preventDefault();
 
   if (!name || !content) {
     return;
@@ -397,12 +408,14 @@ createStampForm.addEventListener("submit", (e) => {
 const exportButton = document.getElementById("exportButton")!;
 
 exportButton.addEventListener("click", () => {
+  playSound("Export");
   exportPNG();
 });
 
 // adds ability to clear canvas
 const clearButton = document.getElementById("clearButton")!;
 clearButton.addEventListener("click", () => {
+  playSound("Clear");
   drawings.splice(0, drawings.length);
   redoDrawings.splice(0, redoDrawings.length);
   redraw();
@@ -411,6 +424,7 @@ clearButton.addEventListener("click", () => {
 //redraws the whole canvas
 const redrawButton = document.getElementById("redrawButton")!;
 redrawButton.addEventListener("click", () => {
+  playSound("Redraw");
   context.clearRect(0, 0, canvas.width, canvas.height);
   setTimeout(() => {
     redraw();
@@ -420,6 +434,7 @@ redrawButton.addEventListener("click", () => {
 // undo button addition and listener
 const undoButton = document.getElementById("undoButton")!;
 undoButton.addEventListener("click", () => {
+  playSound("Undo");
   if (drawings.length > 0) {
     const drawing = drawings.pop();
 
@@ -433,6 +448,7 @@ undoButton.addEventListener("click", () => {
 // redo button addition and listener
 const redoButton = document.getElementById("redoButton")!;
 redoButton.addEventListener("click", () => {
+  playSound("Redo");
   if (redoDrawings.length > 0) {
     const line = redoDrawings.pop();
     if (line) {
