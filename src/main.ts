@@ -75,16 +75,22 @@ context.lineWidth = 3;
 type StampTool = {
   id: string;
   name: string;
+  sound: string;
   image?: HTMLImageElement;
   content?: string;
 };
 
 // where you can put preset (hardcoded) stamps
 const stampTools: StampTool[] = [
-  { id: "squid", name: "Squid", image: squidImg },
-  { id: "octo", name: "Octo", image: octoImg },
-  { id: "rainmaker", name: "Rainmaker", image: rainmakerImg },
-  { id: "splatted", name: "Splatted", image: splattedImg },
+  { id: "squid", name: "Squid", image: squidImg, sound: "Squid" },
+  { id: "octo", name: "Octo", image: octoImg, sound: "Octo" },
+  {
+    id: "rainmaker",
+    name: "Rainmaker",
+    image: rainmakerImg,
+    sound: "Rainmaker",
+  },
+  { id: "splatted", name: "Splatted", image: splattedImg, sound: "Splatted" },
 ];
 
 // contains all of the stamps (will be used to render buttons)
@@ -160,7 +166,7 @@ canvas.addEventListener("pointerdown", (e) => {
     currentLine.points.push({ x: cursor.x, y: cursor.y });
   }
   if (currentTool === "stamp") {
-    playSound(currentStampTool.name, 0.3);
+    playSound(currentStampTool.sound, 0.3);
     if (currentStampTool.image) {
       const stamp: ImageStamp = {
         type: "imageStamp",
@@ -391,6 +397,7 @@ createStampForm.addEventListener("submit", (e) => {
   const newTool: StampTool = {
     id: crypto.randomUUID(),
     name,
+    sound: "Custom",
     content,
   };
 
