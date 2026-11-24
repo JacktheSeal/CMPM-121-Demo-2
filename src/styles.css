@@ -93,3 +93,13 @@ button:hover {
   color: rgb(44, 44, 44);
   transform: scale(1.05);
 }
+
+button:active {
+  transform: scale(0.95);
+}
+
+#stampPalette button:active,
+#maps button:active,
+#colorDiv button:active {
+  transform: scale(0.95);
+}

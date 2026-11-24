@@ -8,7 +8,6 @@ import splatted from "./assets/splatted.png?no-inline";
 import background from "./assets/background.jpg?no-inline";
 import ScorchGorge from "./assets/maps/ScorchGorge.png?no-inline";
 import MantaMaria from "./assets/maps/MantaMaria.png?no-inline";
-
 import UndertowSpillway from "./assets/maps/UndertowSpillway.png?no-inline";
 
 const maps = [

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "lib": ["deno.window", "dom", "dom.iterable"],
-    "strict": true
+    "strict": true,
+    "types": ["vite/client"]
   },
   "lint": { "rules": { "tags": ["recommended"] } },
   "fmt": {
