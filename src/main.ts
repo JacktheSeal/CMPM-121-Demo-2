@@ -10,29 +10,43 @@ import background from "./assets/background.jpg?no-inline";
 import ScorchGorge from "./assets/maps/ScorchGorge.png?no-inline";
 import MantaMaria from "./assets/maps/MantaMaria.png?no-inline";
 import UndertowSpillway from "./assets/maps/UndertowSpillway.png?no-inline";
+import Blank from "./assets/maps/Blank.png?no-inline";
 
-const maps = [
-  { name: "Scorch Gorge", url: ScorchGorge },
-  { name: "Manta Maria", url: MantaMaria },
-  { name: "Undertow Spillway", url: UndertowSpillway },
-  { name: "Blank", url: null },
+type Maps = {
+  name: string;
+  url: string;
+  element: null | HTMLImageElement;
+}[];
+
+const maps: Maps = [
+  { name: "Scorch Gorge", url: ScorchGorge, element: null },
+  { name: "Manta Maria", url: MantaMaria, element: null },
+  { name: "Undertow Spillway", url: UndertowSpillway, element: null },
+  { name: "Blank", url: Blank, element: null },
 ];
+
 for (const map of maps) {
   const button = document.createElement("button");
 
   button.type = "button";
   button.textContent = map.name;
-
   button.title = "Switch map";
+
+  // Make HTML element for each thing in loop
+  const mapElement = document.createElement("img");
+  mapElement.src = map.url;
+  map.element = mapElement;
 
   button.addEventListener("click", () => {
     playSound("Map");
-    if (map.url === null) canvas.style.backgroundImage = `white`;
     canvas.style.backgroundImage = `url(${map.url})`;
+    currentMap = map.element;
   });
 
   document.getElementById("maps")!.append(button);
 }
+
+let currentMap = maps[0].element;
 
 const squidImg = document.createElement("img");
 squidImg.src = squid;
@@ -45,9 +59,6 @@ rainmakerImg.src = rainmaker;
 
 const splattedImg = document.createElement("img");
 splattedImg.src = splatted;
-
-const scorchGorgeImg = document.createElement("img");
-scorchGorgeImg.src = ScorchGorge;
 
 // canvas is where user can draw
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -69,7 +80,6 @@ function getCanvasContext(
   return context;
 }
 const context = getCanvasContext(canvas);
-context.lineWidth = 3;
 
 // setup for shared stamp behavior
 type StampTool = {
@@ -243,9 +253,10 @@ function renderDrawings(
 
   // ensures that all drawables match the scale of the canvas
   targetContext.setTransform(scale, 0, 0, scale, 0, 0);
+  targetContext.lineWidth = 2;
   if (targetCanvas !== canvas) {
     targetContext.drawImage(
-      scorchGorgeImg,
+      currentMap!,
       0,
       0,
       targetCanvas.width / scale,
